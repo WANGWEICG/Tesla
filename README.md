@@ -1,6 +1,8 @@
 # Tesla利息先繳方案-車貸試算器
 
-一個Tesla / （利息先繳）車貸試算工具。
+一個Tesla （利息先繳）車貸試算工具。
+
+https://wangweicg.github.io/Tesla/
 
 ## 功能
 
