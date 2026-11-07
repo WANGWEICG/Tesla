@@ -40,6 +40,20 @@ Worker 名稱必須與 `wrangler.jsonc` 的 `name` 相同。若名字被使用�
 
 ## Tesla 授權設定：可以全程用手機
 
+### 若已填到「組建變數」，不必搬移或重打密碼
+
+可選用專門的部署指令，將組建環境中原本的 APP_PASSWORD、DATA_KEY、PUBLIC_URL 作為同一 Worker 的執行時 Secrets 一起部署：
+
+```sh
+node delivery-tracker/cloudflare/deploy.mjs
+```
+
+以上指令以儲存庫根目錄為基準，適用沒有另外設定 Root directory 的 Cloudflare Builds。若 Root directory 已設成 `delivery-tracker/cloudflare`，則填 `node deploy.mjs`。組建命令維持原設定即可。
+
+此流程使用 Wrangler 官方的 `deploy --secrets-file`；只複製三項指定值，未列出的既有 Secrets 由 Wrangler 保留。PUBLIC_URL 在此路徑也作為 Secret 保存，程式讀取方式相同。腳本不產生新金鑰、不顯示值、不將值提交到 GitHub，而是使用權限 0600 的組建暫存檔，部署結束後清除。執行前會驗證格式，缺值就停止。請維持三項組建值與目前實際使用值相同；未來修改它們後重新部署，也會更新相應執行時設定。
+
+此流程需要 Cloudflare Builds 的部署 API 權杖允許上傳 Worker 與 Secrets；若平台拒絕，保留錯誤碼協助判斷，不要貼出 API Token。此腳本不會替使用者變更權限。
+
 1. 在 [Tesla Developer](https://developer.tesla.com/) 建立應用，依官方要求填寫資料。
 2. Allowed origin：你的 `PUBLIC_URL`。Redirect URI：`PUBLIC_URL/auth/callback`。選取 `openid offline_access user_data`，不需要控制車輛權限。
 3. 在 Cloudflare 的 **Variables and Secrets** 新增 `TESLA_CLIENT_ID`（Text 或 Secret）與 `TESLA_CLIENT_SECRET`（Secret），儲存並部署。
