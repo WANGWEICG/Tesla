@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "tesla-delivery",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "build": { "command": "node build.mjs" },
+  "d1_databases": [{ "binding": "DB" }],
+  "triggers": { "crons": ["*/30 * * * *"] },
+  "observability": { "enabled": false }
+}

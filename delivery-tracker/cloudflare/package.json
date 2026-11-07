@@ -1,0 +1,13 @@
+{
+  "name": "tesla-delivery",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node --test test/*.test.mjs",
+    "deploy": "npx --yes wrangler@4.158.0 deploy"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

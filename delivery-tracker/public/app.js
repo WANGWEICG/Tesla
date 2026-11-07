@@ -20,16 +20,20 @@ function message(value) { $('message').textContent = value; $('message').hidden 
 async function api(path, data) {
   const response = await fetch('/api/' + path, { method: data === undefined ? 'GET' : 'POST', headers: data === undefined ? {} : { 'Content-Type':'application/json' }, body: data === undefined ? undefined : JSON.stringify(data), cache:'no-store' });
   const payload = await response.json();
+  if (payload.setupRequired) { $('cloudflare-setup').hidden=false; $('workspace').hidden=true; $('login').hidden=true; }
   if (!response.ok) { if (response.status === 401) { $('login').hidden = false; $('workspace').hidden = true; current = null; } throw new Error(payload.error || '服務暫時無法使用'); }
   return payload;
 }
 function fmt(v) { if (!v) return '尚未同步'; const d = new Date(v); return isNaN(d) ? v : d.toLocaleString('zh-TW', {timeZone:'Asia/Taipei'}); }
 function render(state) {
-  current = state; $('login').hidden = true; $('workspace').hidden = false;
+  current = state; $('cloudflare-setup').hidden=true; $('login').hidden = true; $('workspace').hidden = false;
   $('connection').textContent = state.connected ? '● Tesla 已連接' : '○ Tesla 未連接';
   $('updated').textContent = state.lastSuccess ? '最後成功同步 ' + fmt(state.lastSuccess) : '等候第一次同步';
   $('auth-description').textContent = state.configured ? `後端每 ${state.pollMinutes} 分鐘檢查一次訂單。請在 Tesla 官方頁面登入及授權。` : '後端尚未設定 Tesla Client ID 與 Secret，請先完成開發者應用設定。';
   $('connect').hidden = !state.configured;
+  $('register').hidden = state.runtime!=='cloudflare'||!state.configured;
+  $('registration').hidden = state.runtime!=='cloudflare';
+  $('registration').textContent = state.registered ? '此服務已於 '+fmt(state.registered.at)+' 完成區域註冊。' : '設定 Tesla Developer 的 origin 與回呼網址後，先按「註冊 Tesla 應用網域」，再進行官方授權。網域能否被 Tesla 接受仍需實際確認。';
   $('connect').textContent = state.connected ? '重新連接 Tesla ↗' : '前往 Tesla 官方授權 ↗';
   $('disconnect').hidden = !state.connected; $('sync').disabled = !state.connected;
   if (state.error) message(state.error);
@@ -70,6 +74,7 @@ $('export').addEventListener('click',()=>{
 async function refresh() { if (fetching || document.hidden) return; fetching=true;try {render(await api('state'));}catch(e){message(e.message);}finally{fetching=false;} }
 async function action(button, callback) { button.disabled=true;message('');try{await callback();}catch(e){message(e.message);}finally{button.disabled=false;} }
 $('login-form').addEventListener('submit',event=>{event.preventDefault();action(event.submitter,async()=>{await api('login',{password:$('password').value});$('password').value='';await refresh();});});
+$('register').addEventListener('click',event=>action(event.target,async()=>{await api('register',{});await refresh();message('Tesla 區域註冊完成，接著可進行官方授權。');}));
 $('sync').addEventListener('click',event=>action(event.target,async()=>{render(await api('sync',{}));message('訂單同步完成。');}));
 $('disconnect').addEventListener('click',event=>action(event.target,async()=>{await api('disconnect',{});await refresh();message('已中斷 Tesla 背景同步。');}));
 $('logout').addEventListener('click',event=>action(event.target,async()=>{await api('logout',{});location.reload();}));
