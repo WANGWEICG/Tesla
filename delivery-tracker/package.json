@@ -1,0 +1,7 @@
+{
+  "name": "tesla-delivery-tracker",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": { "start": "node --env-file-if-exists=.env server.mjs", "test": "node --test" }
+}
