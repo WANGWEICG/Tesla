@@ -2,6 +2,8 @@
 
 私人 Tesla 交車追蹤工具，無社群功能。程式存放 GitHub，網頁適合手機並可加入主畫面。
 
+**不想付 Render 主機費或讓電腦持續開機：請使用 [Cloudflare Workers＋D1 部署教學](./cloudflare/README.md)。** 新版本支援免費額度內的雲端排程與持久儲存，並可在手機完成設定及區域註冊。主機免費額度不代表 Tesla API 必然免費，真實帳號與網域相容性仍需驗證。下方保留原 Node.js／Docker 部署方式。
+
 ## 本版已實作
 
 - Tesla 官方 OAuth 授權、有效訂單同步、多筆訂單顯示。
